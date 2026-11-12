@@ -318,6 +318,8 @@ chatForm.addEventListener('submit', async (e) => {
     : text;
   state.rawCurrent = currentLang === 'en' ? text : undefined; // para citar tus palabras originales
 
+  clearSeriousIfRecovered(brainText, state);
+
   // 1. ¿es una orden de cambiar de idioma? se procesa siempre, en cualquier modo
   const langCommand = detectLangCommand(text);
   if (langCommand) {

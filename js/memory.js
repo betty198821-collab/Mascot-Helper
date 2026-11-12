@@ -204,6 +204,31 @@ function isSeriousContextActive(state) {
   return diff <= (s.id === 'crisis' ? 20 : 8);
 }
 
+const RECOVERY_CLEARS_CRISIS = false;
+const RECOVERY_RE = /(me siento|estoy|ando|me encuentro) (muy |mucho |bastante |un poco |algo |re |super )?(mejor|bien|genial|tranquil[oa]|feliz|content[oa])|ya (paso|estoy bien|me siento bien|me siento mejor|estoy mejor)|ya no (me siento|estoy) (mal|triste|sol[oa]|ansios[oa])/;
+const RECOVERY_BLOCK_RE = /\bno (me siento|estoy|ando|me encuentro)\b|\bno (muy|tan) bien\b|\bni (muy )?bien\b/;
+const STILL_BAD_RE = /\b(triste|mal|sol[oa]|ansios[oa]|deprimid[oa]|vac[ií][oa]|nadie|llor\w*|no puedo)\b/;
+
+function isRecoveryMessage(text) {
+  const t = stripAccents(String(text).toLowerCase());
+  if (!RECOVERY_RE.test(t) || RECOVERY_BLOCK_RE.test(t)) return false;
+  // "ya no me siento mal" cuenta como mejora; pero "me siento bien, aunque sigo triste" no
+  const rest = t.replace(/ya no (me siento|estoy) (mal|triste|sol[oa]|ansios[oa])/g, '');
+  return !STILL_BAD_RE.test(rest);
+}
+
+function clearSeriousIfRecovered(text, state) {
+  const s = state.serious;
+  if (!s || !isRecoveryMessage(text)) return false;
+  if (state.awaitingSafety) return false; // la pregunta de "¿estás a salvo?" la maneja support.js
+  if (s.id === 'crisis' && !RECOVERY_CLEARS_CRISIS) return false;
+  state.serious = null;
+  state.awaitingAdvice = false;
+  state.awaitingContinue = false;
+  state.awaitingReturn = false;
+  return true;
+}
+
 function modeBlockedReply(state, modeKey) {
   const label = MODE_LABELS[modeKey] ? MODE_LABELS[modeKey].es : modeKey;
   const line = pickNoRepeat(MODE_BLOCKED_LINES, state, 'modeblocked');
