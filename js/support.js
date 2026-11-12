@@ -280,6 +280,24 @@ const NO_RE = /^(no|ahora no|nah|nop|todavia no)\b/;
 // pedidos explícitos de los consejos nuevos (advice-extra.js)
 const SURVIVOR_ADVICE_RE = /sobreviviente|sobrevivi(r|o|eron|ste) a un intento|consejos? de (personas|gente) que (intentaron|han intentado|pasaron por)|despues de (un|mi) intento|survivors?\b|after (an|my) attempt/;
 const EMPTINESS_ADVICE_RE = /(consejos?|ayuda|que hago|como (salgo|supero|lidio)).{0,25}vacio|vacio.{0,25}(consejos?|ayuda|que hago)|advice.{0,20}empt(y|iness)|empt(y|iness).{0,20}advice/;
+// pedidos de consejos de UN tema concreto: "dame consejos para la soledad / la depresión / la ansiedad..."
+// (usa los consejos guardados en ADVICE; cada tema tiene los suyos). Hace falta una palabra de
+// "consejo/ayuda" Y una palabra del tema. Para agregar un tema o una palabra, editá esta lista.
+const ADVICE_WORD_RE = /consejo|\btips?\b|advice|ayuda|ayudame|que hago|que puedo hacer|como (salgo|supero|lidio|enfrento|manejo|combato|vencer|sobrellevo)|como (puedo )?(superar|manejar|enfrentar|salir|sobrellevar)/;
+const ADVICE_TOPIC_WORDS = [
+  ['soledad',   /soledad|me siento sol[oa]|sentirme sol[oa]|sentirse sol[oa]|estar sol[oa]|solitari|loneli/],
+  ['ansiedad',  /ansiedad|ansios|nervios|panico|estres|preocupacion|anxiety|anxious|stress/],
+  ['enojo',     /enojo|enojad|rabia|\bira\b|furia|enfado|anger|angry/],
+  ['suicidio',  /suicid|no querer vivir|no quiero vivir|ganas de morir|querer morir/],
+  ['autolesion',/autolesi|lastimarme|hacerme dano|self.?harm/],
+  ['tristeza',  /tristeza|triste|depresion|deprimid|desanimo|melancoli|autoestima|motivacion|fracaso|sadness|depress/],
+];
+function topicAdviceKey(tn) {
+  if (!ADVICE_WORD_RE.test(tn)) return null;
+  for (const [key, re] of ADVICE_TOPIC_WORDS) if (re.test(tn) && ADVICE[key]) return key;
+  return null;
+}
+
 const ADVICE_REQUEST_RE = /consejo|que (puedo|debo|deberia) hacer|ayudame|dame ayuda|como (salgo|supero|lidio|me siento mejor|dejo de sentirme|puedo salir)|necesito ayuda|que hago\b|no se que hacer|advice|help me|what should i do/;
 
 // sigue las conversaciones de apoyo: "¿estás a salvo?", "¿querés consejos?" y
@@ -313,6 +331,9 @@ function handleSupport(text, state) {
 
   if (SURVIVOR_ADVICE_RE.test(tn) && ADVICE.intento) return giveAdvice(state, 'intento');
   if (EMPTINESS_ADVICE_RE.test(tn) && ADVICE.vacio) return giveAdvice(state, 'vacio');
+
+  const topicKey = topicAdviceKey(tn);
+  if (topicKey) return giveAdvice(state, topicKey);
 
   if (ADVICE_REQUEST_RE.test(tn)) {
     const isLongVent = tn.split(/\s+/).length > 8 && typeof findEmotionalReply === 'function' && findEmotionalReply(text);

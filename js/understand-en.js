@@ -166,6 +166,7 @@ R(/\bafter (?:an|my) attempt\b/, 'después de un intento');
 R(/\b(?:give me|i need|i want|can you give me|do you have) (?:some |any )?(?:advice|tips)\b/, 'dame consejos');
 R(/\bwhat (?:should|can|do) i do\b/, 'qué puedo hacer');
 R(/\bi do not know what to do\b/, 'no sé qué hacer');
+R(/\bhow (?:do|can) i (?:deal with|cope with|handle|overcome|beat|fight|get over|manage) (?:my |the )?/, 'cómo supero ');
 R(/\bhow (?:do|can) i (?:feel better|cope|get over (?:it|this)|deal with (?:it|this))\b/, 'cómo me siento mejor');
 R(/\bhelp me\b/, 'ayúdame');
 R(/\bi need help\b/, 'necesito ayuda');
@@ -262,6 +263,7 @@ const EN_WORDS = {
   depression: 'depresión', sadness: 'tristeza', empty: 'vacío', emptiness: 'vacío', anxiety: 'ansiedad',
   anxious: 'ansioso', angry: 'enojado', scared: 'miedo', afraid: 'miedo', fear: 'miedo', cry: 'llorar',
   crying: 'llorar', proud: 'orgulloso', numb: 'entumecido', worried: 'preocupado', stressed: 'abrumado',
+  anger: 'enojo', stress: 'estrés', worry: 'preocupación', sadness: 'tristeza', depression: 'depresión', loneliness: 'soledad',
   advice: 'consejos', tips: 'consejos', survivors: 'sobrevivientes', survivor: 'sobreviviente',
   today: 'hoy', tomorrow: 'mañana', yesterday: 'ayer', tonight: 'esta noche', now: 'ahora',
   friend: 'amigo', friends: 'amigos', family: 'familia', school: 'escuela', work: 'trabajo', home: 'casa',
